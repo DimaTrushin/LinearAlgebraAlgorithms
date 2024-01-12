@@ -1,0 +1,423 @@
+\documentclass{article}
+
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+
+\usepackage[left=2cm,right=2cm, top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{mathtext}
+\usepackage{mathdots}
+\usepackage[all]{xy}
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}  
+
+\newcommand{\tr}{\operatorname{\mathrm{tr}}}
+\newcommand{\MatrixDim}[3]{\operatorname{\mathrm{M}_{#2\,#3}}(#1)}
+\newcommand{\Matrix}[2]{\operatorname{\mathrm{M}_{#2}}(#1)}
+\newcommand{\rk}{\operatorname{rk}}
+\newcommand{\diag}{\operatorname{diag}}
+\renewcommand{\Im}{\operatorname{Im}}
+
+\renewcommand{\thesubsection}{\arabic{subsection}}
+
+\begin{document}
+
+\section*{Алгоритмы}
+
+\subsection{Выделение базиса из системы векторов}
+
+\paragraph{Дано}
+
+Пусть $v_1,\ldots,v_m\in F^n$ -- вектора и $V = \langle v_1,\ldots,v_m\rangle$ -- их линейная оболочка.
+
+\paragraph{Задача}
+
+Среди векторов $v_1,\ldots,v_m$ найти базис пространства $V$ и разложить оставшиеся вектора по этому базису.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Запишем вектора $v_1,\ldots,v_m$ по столбцам в матрицу $A \in \MatrixDim{F}{n}{m}$.
+Например, при $n = 3$, $m = 5$
+\[
+A = 
+\begin{pmatrix}
+{v_{11}}&{v_{21}}&{v_{31}}&{v_{41}}&{v_{51}}\\
+{v_{12}}&{v_{22}}&{v_{32}}&{v_{42}}&{v_{52}}\\
+{v_{13}}&{v_{23}}&{v_{33}}&{v_{43}}&{v_{53}}\\
+\end{pmatrix}
+\]
+
+\item Приведем матрицу $A$ элементарными преобразованиями строк к улучшенному ступенчатому виду.
+Например
+\[
+A' = 
+\begin{pmatrix}
+{1}&{0}&{a_{31}}&{0}&{a_{51}}\\
+{0}&{1}&{a_{32}}&{0}&{a_{52}}\\
+{0}&{0}&{0}&{1}&{a_{53}}\\
+\end{pmatrix}
+\]
+
+\item Пусть $k_1,\ldots,k_r$ -- номера главных позиций в матрице $A'$.
+Тогда вектора $v_{k_1},\ldots,v_{k_r}$ образуют базис $V$.
+Например, в примере выше это вектора $v_1$, $v_2$ и $v_4$.
+
+\item Пусть $v_i$ -- вектор соответствует неглавной позиции в $A'$.
+Тогда в $i$-ом столбце $A'$ записаны координаты разложения $v_i$ через найденный базис выше.
+Например, в примере выше $v_3 = a_{31}v_1 + a_{32}v_2$ и $v_5 = a_{51}v_1 + a_{52}v_2 + a_{53}v_4$.
+\end{enumerate}
+
+\paragraph{Пример}
+
+Пусть 
+\[
+v_1 =
+\begin{pmatrix}
+{1}\\{3}\\{2}
+\end{pmatrix},\,
+v_2 =
+\begin{pmatrix}
+{1}\\{2}\\{1}
+\end{pmatrix},\,
+v_3 =
+\begin{pmatrix}
+{5}\\{12}\\{7}
+\end{pmatrix},\,
+v_4 =
+\begin{pmatrix}
+{1}\\{1}\\{1}
+\end{pmatrix},\,
+v_5 =
+\begin{pmatrix}
+{-1}\\{1}\\{0}
+\end{pmatrix}\in F^3
+\]
+Тогда
+\begin{gather*}
+\begin{pmatrix}
+{1}&{1}&{5}&{1}&{-1}\\
+{3}&{2}&{12}&{1}&{1}\\
+{2}&{1}&{7}&{1}&{0}\\
+\end{pmatrix}\mapsto
+\begin{pmatrix}
+{1}&{1}&{5}&{1}&{-1}\\
+{0}&{0}&{0}&{-1}&{2}\\
+{2}&{1}&{7}&{1}&{0}\\
+\end{pmatrix}\mapsto
+\begin{pmatrix}
+{1}&{1}&{5}&{1}&{-1}\\
+{0}&{0}&{0}&{-1}&{2}\\
+{1}&{0}&{2}&{0}&{1}\\
+\end{pmatrix}\mapsto\\\mapsto
+\begin{pmatrix}
+{1}&{0}&{2}&{0}&{1}\\
+{1}&{1}&{5}&{1}&{-1}\\
+{0}&{0}&{0}&{1}&{-2}\\
+\end{pmatrix}\mapsto
+\begin{pmatrix}
+{1}&{0}&{2}&{0}&{1}\\
+{0}&{1}&{3}&{1}&{-2}\\
+{0}&{0}&{0}&{1}&{-2}\\
+\end{pmatrix}\mapsto
+\begin{pmatrix}
+{1}&{0}&{2}&{0}&{1}\\
+{0}&{1}&{3}&{0}&{0}\\
+{0}&{0}&{0}&{1}&{-2}\\
+\end{pmatrix}
+\end{gather*}
+Тогда $v_1$, $v_2$ и $v_4$ -- базис линейной оболочки и $v_3 = 2v_1 + 3 v_2$ и $v_5 = v_1 - 2 v_4$.
+
+\subsection{Нахождение какого-то базиса линейной оболочки}
+
+\paragraph{Дано}
+
+Пусть $v_1,\ldots,v_m\in F^n$ -- вектора и $V = \langle v_1,\ldots,v_m\rangle$ -- их линейная оболочка.
+
+\paragraph{Задача}
+
+Найти какой-нибудь базис подпространства $V$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Уложить все вектора $v_i$ в строки матрицы $A\in \MatrixDim{F}{m}{n}$.
+
+\item Элементарными преобразованиями строк привести матрицу к ступенчатому виду.
+
+\item Ненулевые строки полученной матрицы будут искомым базисом.
+\end{enumerate}
+
+\subsection{Дополнение линейно независимой системы до базиса всего пространства стандартными векторами}
+
+\paragraph{Дано}
+
+Пусть $v_1,\ldots,v_m\in F^{n}$ -- линейно независимая система векторов, $V = \langle v_1,\ldots,v_m \rangle$ -- их линейная оболочка и $e_i$ -- стандартные базисные векторы, т.е. на $i$-ом месте стоит $1$, а в остальных $0$.
+
+\paragraph{Задача}
+
+Найти такие вектора $e_{k_1},\ldots, e_{k_{n-m}}$, что система $v_1,\ldots,v_m,e_{k_1},\ldots,e_{k_{n-m}}$ является базисом $F^{n}$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Уложить вектора $v_i$ в строки матрицы $A\in\MatrixDim{F}{m}{n}$.
+
+\item Привести матрицу $A$ к ступенчатому виду.
+
+\item Пусть $k_1,\ldots,k_{n-m}$ -- номера неглавных столбцов.
+Тогда $e_1,\ldots,e_{k_{n-m}}$ -- искомое множество.
+\end{enumerate}
+
+\subsection{Найти ФСР однородной СЛУ}
+
+\paragraph{Дано}
+
+Система однородных линейных уравнений $Ax = 0$, где $A\in \MatrixDim{F}{m}{n}$ и $x\in F^{n}$.
+
+\paragraph{Задача}
+
+Найти ФСР системы $Ax = 0$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Привести матрицу $A$ элементарными преобразованиями строк к улучшенному ступенчатому виду.
+Например
+\[
+A' = 
+\begin{pmatrix}
+{1}&{0}&{a_{31}}&{0}&{a_{51}}\\
+{0}&{1}&{a_{32}}&{0}&{a_{52}}\\
+{0}&{0}&{0}&{1}&{a_{53}}\\
+\end{pmatrix}
+\]
+
+\item Пусть $k_1,\ldots,k_r$ -- позиции свободных переменных.
+Если положить одну из этих переменных равной $1$, а все остальные нулями, то существует единственное решение, которое мы обозначим через $u_i$ (всего $r$ штук).
+Например, для матрицы $A'$ выше свободные переменные имеют номера $3$ и $5$.
+Тогда вектора (записанные в строку)
+\[
+u_1 = 
+\begin{pmatrix}
+{-a_{31}}&{-a_{32}}&{1}&{0}&{0}
+\end{pmatrix},\,
+u_2 = 
+\begin{pmatrix}
+{-a_{51}}&{-a_{52}}&{0}&{-a_{53}}&{1}
+\end{pmatrix}
+\]
+являются ФСР.
+\end{enumerate}
+
+\subsection{Задать подпространство базисом, если оно задано матричным уравнением}
+
+\paragraph{Дано}
+
+Пусть $A\in\MatrixDim{F}{m}{n}$ и $V\subseteq F^{n}$ задано в виде $V = \{y\in F^{n}\mid A y = 0\}$.
+
+\paragraph{Задача}
+
+Найти базис подпространства $V$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Найти ФСР системы $Ay = 0$.
+Векторы ФСР будут базисом $V$.
+\end{enumerate}
+
+\subsection{Задать подпространство матричным уравнением, если оно задано линейной оболочной}
+
+\paragraph{Дано}
+
+Пусть $v_1,\ldots,v_k\in F^{n}$ -- набор векторов и $V = \langle v_1,\ldots,v_k \rangle$.
+
+\paragraph{Задача}
+
+Для некоторого $m$ найти матрицу $A\in\MatrixDim{F}{m}{n}$ такую, что $V = \{y\in F^{n}\mid Ay = 0\}$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Уложить вектора $v_i$ в строки матрицы $B\in \MatrixDim{F}{k}{n}$.
+
+\item Найти ФСР системы $Bz = 0$.
+
+\item Уложить ФСР в строки матрицы $A\in \MatrixDim{F}{m}{n}$, где $m$ -- количество векторов в ФСР.
+Матрица $A$ и будет искомой.
+\end{enumerate}
+
+\subsection{Найти матрицу замены координат}
+
+\paragraph{Дано}
+
+Векторное пространство $V$, $e=(e_1,\ldots,e_n)$ и $f = (f_1,\ldots,f_n)$ -- два базиса пространства $V$.
+Известна матрица перехода от $e$ к $f$, т.е. $(f_1,\ldots,f_n) = (e_1,\ldots,e_n)A$, где $A\in \Matrix{F}{n}$.
+Дан вектор $v = x_1e_1+\ldots+x_n e_n$.
+
+\paragraph{Задача}
+
+Найти разложение $v$ по  базису $f$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Если $v = e x$, где $x\in F^{n}$, а также $v = f y$, где $y\in F^{n}$, то $y = A^{-1}x$.
+\end{enumerate}
+
+\subsection{Найти матрицу линейного отображения при замене базиса}
+
+\paragraph{Дано}
+
+Векторное пространство $V$ с базисами $e=(e_1,\ldots,e_n)$ и $e'=(e'_1,\ldots,e'_n)$, а также векторное пространство $U$ с базисами $f = (f_1,\ldots,f_m)$ и $f' = (f'_1,\ldots,f'_m)$.
+Известны матрицы перехода $(e'_1,\ldots,e'_n) = (e_1,\ldots,e_n)C$ и $(f'_1,\ldots,f'_m) = (f_1,\ldots,f_m)D$, где $C\in \Matrix{F}{n}$ и $D\in \Matrix{F}{m}$.
+Дано линейное отображение $\phi\colon V\to U$ заданное в базисах $e$ и $f$ матрицей $A\in\MatrixDim{F}{n}{m}$, т.е. $\phi e = f A$.
+
+\paragraph{Задача}
+
+Найти матрицу отображения $\phi$ в базисах $e'$ и $f'$, то есть такую $A'\in \MatrixDim{F}{n}{m}$, что $\phi e' = f' A'$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item $A' = D^{-1} A C$.
+\end{enumerate}
+
+
+\subsection{Определить существует ли линейное отображение заданное на векторах}
+
+\paragraph{Дано}
+
+Векторное пространство $V$ над полем $F$ и набор векторов $v_1,\ldots,v_k\in V$, векторное пространство $U$ и набор векторов $u_1,\ldots,u_k\in U$.
+
+\paragraph{Задача}
+
+Определить существует ли линейное отображение $\phi\colon V\to U$ такое, что $\phi(v_i) = u_i$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Среди векторов $v_1,\ldots,v_k$ выделить линейно независимые, а остальные разложить по ним.
+
+\item Пусть на предыдущем этапе базис получился $v_1,\ldots,v_r$, а $v_{r + i} = a_{i1} v_1 + \ldots + a_{ir}v_r$.
+
+\item Искомое линейное отображение $\phi$ существует тогда и только тогда, когда выполняются равенства $u_{r+i} = a_{i1}u_1 + \ldots + a_{ir}u_r$.%
+\footnote{В частности, если все $v_i$ оказались линейно независимыми, то линейное отображение $\phi$ обязательно существует.}
+\end{enumerate}
+
+\subsection{Найти базис образа и ядра линейного отображения}
+
+\paragraph{Дано}
+
+$\phi\colon F^{n}\to F^{m}$ задан $x\mapsto Ax$, где $A\in\MatrixDim{F}{m}{n}$.
+
+\paragraph{Задача}
+
+Найти базис $\Im \phi\in F^{m}$ и базис $\ker \phi\in F^{n}$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Выделить базис среди столбцов матрицы $A$.
+В результате получится базис $\Im \phi$.
+
+\item Найти ФСР системы $Ax = 0$.
+Полученная ФСР будет базисом $\ker \phi$.
+\end{enumerate}
+
+\subsection{Найти линейное отображение с заданными ядром и образом}
+
+\paragraph{Дано}
+
+Пространства $U\subseteq F^n$ и $W \subseteq F^m$ такие, что $\dim U + \dim W = n$.
+
+\paragraph{Задача}
+
+Найти матрицу линейного отображения $\varphi \colon F^n \to F^m$ такого, что $U = \ker \varphi$ и $W = \Im \varphi$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Задать подпространство $W$ с помощью базиса.
+Пусть $b_1,\ldots,b_k$ -- базис $W$.
+Определим матрицу $B = (b_1 |\ldots |b_k)$.
+
+\item Задать подпространство $U$ системой с линейно независимыми строками $U = \{y\in F^n \mid A y = 0\}$.
+
+\item В силу условия $\dim U + \dim W = n$ матрица $A$ будет иметь столько же строк, сколько столбцов в матрице $B$.
+В этом случае искомое линейное отображение задается матрицей $BA$.
+\end{enumerate}
+
+\subsection{Найти сумму подпространств заданных линейными оболочками}
+
+\paragraph{Дано}
+
+Подпространства $V,U\subseteq F^{n}$ заданные в виде $V = \langle v_1,\ldots,v_m\rangle$, $U = \langle u_1,\ldots,u_k\rangle$, где $v_i,u_j\in F^{n}$.
+
+\paragraph{Задача}
+
+Найти базис $V + U$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Надо найти базис линейной оболочки $\langle v_1,\ldots,v_m,u_1,\ldots,u_k\rangle$.
+\end{enumerate}
+
+\subsection{Найти пересечение подпространств заданных линейными оболочками}
+
+\paragraph{Дано}
+
+Подпространства $V,U\subseteq F^{n}$ заданные в виде $V = \langle v_1,\ldots,v_m\rangle$, $U = \langle u_1,\ldots,u_k\rangle$, где $v_i,u_j\in F^{n}$.
+
+\paragraph{Задача}
+
+Найти базис $V\cap U$.%
+\footnote{В это задаче можно задать подпространства системами, потом найти пересечение в виде системы, потом задать результат базисом.
+Но есть куда более эффективный способ.}
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Найти ФСР системы $D x = 0$, где $D = (v_1|\ldots|v_m|u_1|\ldots|u_k)$ и $x = \left(\frac{\alpha}{\beta}\right)$, где $\alpha\in F^{m}$, $\beta\in F^{k}$.
+
+\item Пусть $\left(\left.\left.\frac{\alpha_1}{\beta_1}\right|\ldots\right|\frac{\alpha_s}{\beta_s}\right)$ -- ФСР.
+Далее есть две опции (из них вторая опция предпочтительнее!):
+\begin{itemize}
+\item Множество векторов $R = (v_1|\ldots|v_m)(\alpha_1|\ldots|\alpha_s)$ порождает $V\cap U$.
+Среди $(\alpha_1|\ldots|\alpha_s)$ можно выкинуть те $\alpha_i$, для которых $\beta_i = 0$.%
+\footnote{Если ФСР построен по стандартному базису, то останутся $\alpha_i$ с нулевыми свободными переменными.}
+
+\item Множество векторов $R' = (u_1|\ldots|u_k)(\beta_1|\ldots|\beta_s)$ порождает  $V\cap U$.
+Причем можно рассматривать только ненулевые $\beta_i$.
+\end{itemize}
+
+\item Выделить базис среди столбцов $R$.
+Это и будет базис $V\cap U$.
+\begin{itemize}
+\item Если векторы $u_1,\ldots,u_k$ были линейно независимы изначально и $\beta_i,\ldots,\beta_s$ -- все ненулевые сегменты ФСР с прошлого шага, то $(u_1|\ldots|u_k)(\beta_i|\ldots|\beta_s)$ будет базисом $V\cap U$.
+\end{itemize}
+\end{enumerate}
+
+\subsection{Найти пересечение подпространств заданных матричным уравнением}
+
+\paragraph{Дано}
+
+Подпространства $V,U\subseteq F^{n}$ заданные в виде $V = \{y\in F^{n}\mid Ay = 0\}$, $U = \{y\in F^{n}\mid By = 0\}$, где $A\in \MatrixDim{F}{m}{n}$ и $B\in \MatrixDim{F}{k}{n}$.
+
+\paragraph{Задача}
+
+Задать $V\cap U$ в виде $\{y\in F^{n}\mid D y = 0\}$ для некоторого $D\in\MatrixDim{F}{k}{n}$, где $\rk D = k\leqslant n$.
+
+\paragraph{Алгоритм}
+
+\begin{enumerate}
+\item Рассмотреть матрицу $D' = \left(\frac{A}{B}\right)$.
+
+\item Выделить среди строк $D'$ линейно независимую подсистему.
+Результат и будет искомая $D$.
+\end{enumerate}
+
+\end{document}
