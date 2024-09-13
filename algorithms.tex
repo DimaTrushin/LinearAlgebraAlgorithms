@@ -429,6 +429,28 @@ $\phi\colon F^{n}\to F^{m}$ задан $x\mapsto Ax$, где $A\in\MatrixDim{F}{
 
 \paragraph{Задача}
 
+Найти базис $V \cap U$.
+
+\paragraph{Алгоритм}
+\begin{enumerate}
+\item Определим матрицу $B = (v_1|\ldots|v_m)$ и найдем ФСР для системы $AB x = 0$. Пусть это будет $x_1,\ldots, x_t$.
+
+\item Тогда столбцы матрицы $R = B (x_1|\ldots|x_t)$ порождают $V \cap U$.
+
+\item Отобрать среди столбцов $R$ линейно независимые.
+\begin{itemize}
+\item Если $v_1,\ldots,v_m$ были линейно независимы (то есть базис $V$), то столбцы $R$ уже будут линейно независимыми.
+\end{itemize}
+\end{enumerate}
+
+\subsection{Найти пересечение подпространств заданных разными способами}
+
+\paragraph{Дано}
+
+Подпространства $V,U\subseteq F^{n}$ заданные в виде $V =\langle v_1,\ldots,v_m\rangle$, $U = \{y\in F^{n}\mid Ay = 0\}$, где $A\in \MatrixDim{F}{k}{n}$.
+
+\paragraph{Задача}
+
 Задать $V \cap U$ системой линейных уравнений.
 
 \paragraph{Алгоритм}
